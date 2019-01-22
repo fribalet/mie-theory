@@ -20,21 +20,21 @@ culture2 <- culture2[order(culture2$norm.fsc),]
 
 beads740 <- read.csv("740-summary.csv")
 beads740$fsc <- 10^((beads740$fsc.corr.high/2^16)*3.5)
-id.1 <- which(beads740$size == 1) # find 1 micron beads
+id.740 <- which(beads740$size == 1) # find 1 micron beads
 
 beads989<- read.csv("989-summary.csv")
 beads989$fsc <- 10^((beads989$fsc.corr.high/2^16)*3.5)
-id.1 <- which(beads989$size == 1) # find 1 micron beads
+id.989 <- which(beads989$size == 1) # find 1 micron beads
 
 beads751 <- read.csv("751-summary.csv")
 beads751$fsc <- 10^((beads751$fsc.corr.high/2^16)*3.5)
-id.1 <- which(beads751$size == 1) # find 1 micron beads
+id.751<- which(beads751$size == 1) # find 1 micron beads
 
 par(mfrow=c(1,1),pty='s')
 plot(0, ylim=c(0.3,7), xlim=c(0.005,10), log='xy')
-points((0.90*beads740$fsc/mean(beads740[id.1,'fsc']))^0.82, beads740$size,cex=2, col=1)
-points((beads751$fsc/mean(beads751[id.1,'fsc']))^1, beads751$size,cex=2, col=2)
-points((beads989$fsc/mean(beads989[id.1,'fsc']))^0.95, beads989$size,cex=2, col=3)
+points((0.90*beads740$fsc/mean(beads740[id.740,'fsc']))^0.82, beads740$size,cex=2, col=1)
+points((beads751$fsc/mean(beads751[id.751,'fsc']))^1, beads751$size,cex=2, col=2)
+points((beads989$fsc/mean(beads989[id.989,'fsc']))^0.95, beads989$size,cex=2, col=3)
 
 
 
@@ -59,9 +59,9 @@ id1 <- findInterval(1 , mie4[,1]) # find 1 micron beads
 id1b <- findInterval(1 , mie4b[,1]) # find 1 micron beads
 
 plot((mie4[,2]/c)^b, mie4[,1], col='red3', type='l', ylim=c(0.3,7), xlim=c(0.005,10), log='xy', main=paste(inst)); lines((mie4b[,2]/c)^b, mie4b[,1], col='green', type='l')
-if(inst == 740) points((beads740$fsc/mean(beads740[id.1,'fsc'])), beads740$size,cex=2, col=1)
-if(inst == 751) points((beads751$fsc/mean(beads751[id.1,'fsc'])), beads751$size,cex=2, col=1)
-if(inst == 989) points((beads989$fsc/mean(beads989[id.1,'fsc'])), beads989$size,cex=2, col=1)
+if(inst == 740) points((beads740$fsc/mean(beads740[id.740,'fsc'])), beads740$size,cex=2, col=1)
+if(inst == 751) points((beads751$fsc/mean(beads751[id.751,'fsc'])), beads751$size,cex=2, col=1)
+if(inst == 989) points((beads989$fsc/mean(beads989[id.989,'fsc'])), beads989$size,cex=2, col=1)
 
 
 
