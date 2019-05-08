@@ -31,7 +31,7 @@ beads751 <- beads751[order(beads751$size),]
 ### OPTIMIZATION ###
 ####################
 library(DEoptim)
-                 
+
 # Mie theory fitting
 # n <- c(1.35/1.3371, 1.41/1.3371) # range given in Lehmuskero et al. Progr Oceanogr 2018
 mie2 <- t(read.csv("meidata-1017.csv" ,header=F)) # low
@@ -48,14 +48,14 @@ sigma.lsq <- function(mie, beads, params){
      scatt <- (mie[id,2]/c)^b
 
            df <- data.frame(obs=beads$normalized.fsc, pred=scatt)
-      sigma <- mean(abs(df$obs - df$pred)/df$obs,na.rm=T)
+      sigma <- mean(((df$obs - df$pred)/df$obs)^2,na.rm=T)
       return(sigma)
   }
 
 
 
 ######################################################
-#### compare MIE prediction with calibration beads ### 
+#### compare MIE prediction with calibration beads ###
 ######################################################
 png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
 
@@ -71,19 +71,22 @@ if(inst == 740) beads <- beads740
 if(inst == 751) beads <- beads751
 if(inst == 989) beads <- beads989
 
-beads1 <- subset(beads,  size < 3) # run to test optimzation across range of particle size
+beads1 <- subset(beads,  size > 0.3) # run to test optimzation across range of particle size, except 0.3 microns beads not properly analyzed.
 
 f <- function(params) sigma.lsq(mie=mie4, beads=beads1, params)
 res <- DEoptim(f, lower=c(0,0), upper=c(10000,2), control=DEoptim.control(itermax=1000, reltol=1e-8,trace=100, steptol=100, strategy=2, parallelType=0))
 print(res$optim$bestval)
 params <- res$optim$bestmem # optimized 'c' and 'b' values
 print(params)
-                
+
 
 ### CREATE LOOKUP TABLE
-d <- 0.220 #Shalapyonok et al. 2001; 0.220 (Li et al. 1992, Veldhuis et al. 2004, and more studies agreed with 220 fg C um-3)
+#d <- 0.220; e <- 1 # LINEAR Shalapyonok et al. 2001; 0.220 (Li et al. 1992, Veldhuis et al. 2004, and more studies agreed with 220 fg C um-3)
+#d <- 0.54; e <- 0.85 # EXPO Roy, S., Sathyendranath, S. & Platt, T. Size-partitioned phytoplankton carbon and carbon-to-chlorophyll ratio from ocean colour by an absorption-based bio-optical algorithm. Remote Sens. Environ. 194, 177–189 (2017).
+d <- 0.216; e <- 0.939 # EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
+
 max.scatter <- 20
-min.scatter <- 0.0001
+min.scatter <- 0.00001
 
 b <- params[2]
 c <- params[1]
@@ -92,10 +95,10 @@ scatter <- 10^(seq(log10(min(mie1[,2]/c)), log10(max(mie3[,2]/c)),length.out=100
 s1 <- approx((mie1[,2]/c)^b, mie1[,1], xout=scatter)
 s2 <- approx((mie2[,2]/c)^b, mie2[,1], xout=scatter)
 s3 <- approx((mie3[,2]/c)^b, mie3[,1], xout=scatter)
-s4 <- approx((mie1[,2]/c)^b, d*(4/3*pi*(0.5*mie1[,1])^3), xout=scatter)
-s5 <- approx((mie2[,2]/c)^b, d*(4/3*pi*(0.5*mie2[,1])^3), xout=scatter)
-s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3), xout=scatter)
-		
+s4 <- approx((mie1[,2]/c)^b, d*(4/3*pi*(0.5*mie1[,1])^3)^e, xout=scatter)
+s5 <- approx((mie2[,2]/c)^b, d*(4/3*pi*(0.5*mie2[,1])^3)^e, xout=scatter)
+s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3)^e, xout=scatter)
+
 		if(inst == 740){mie_740 <- data.frame(cbind(scatter=s1$x,
                                                   diam_740_mid=s1$y,diam_740_upr=s2$y,diam_740_lwr = s3$y,
                                                   Qc_740_mid=s4$y, Qc_740_upr=s5$y, Qc_740_lwr=s6$y))
@@ -114,19 +117,17 @@ s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3), xout=scatter)
 						}
 
 
-plot(beads$normalized.fsc, beads$size,log='xy', main=paste(inst), xlim=c(0.005,10), ylim=c(0.3,7), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)") 
-lines((mie4[,2]/c)^b, mie4[,1], col='red3')
+plot(beads$normalized.fsc, beads$size,log='xy', main=paste(inst), xlim=c(0.005,10), ylim=c(0.2,50), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)")
+lines((mie4[,2]/c)^(b), mie4[,1], col='red3')
 legend("topleft",legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
-				
-				
+
+
 }
-                 
-dev.off()                 
-                 
-                 
-                      
-mie <- data.frame(cbind(mie_740, mie_751[,-1], mie_989[,-1]))
+
+dev.off()
+
+
+
+mie <- data.frame(cbind(mie_740[,], mie_751[,-1], mie_989[,-1]))
 
 write.csv(mie, "calibrated-mie.csv", row.names=F, quote=F)
-
-

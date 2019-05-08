@@ -27,7 +27,8 @@ mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,
 
 
 ### MERGING + SD
-                      d <- 0.220
+                      d <- 0.216
+                      e <- 0.939
                       max.scatter <- 20
                       min.scatter <- 0.0001
 
@@ -37,9 +38,9 @@ mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,
                       s1 <- approx(mie1[,2]/c1, mie1[,1], xout=scatter)
                       s2 <- approx(mie2[,2]/c1, mie2[,1], xout=scatter)
                       s3 <- approx(mie3[,2]/c1, mie3[,1], xout=scatter)
-                      s4 <- approx(mie1[,2]/c1, (4/3*pi*(0.5*mie1[,1])^3)*d, xout=scatter)
-                      s5 <- approx(mie2[,2]/c1, (4/3*pi*(0.5*mie2[,1])^3)*d, xout=scatter)
-                      s6 <- approx(mie3[,2]/c1, (4/3*pi*(0.5*mie3[,1])^3)*d, xout=scatter)
+                      s4 <- approx(mie1[,2]/c1, d*(4/3*pi*(0.5*mie1[,1])^3)*e, xout=scatter)
+                      s5 <- approx(mie2[,2]/c1, d*(4/3*pi*(0.5*mie2[,1])^3)*e, xout=scatter)
+                      s6 <- approx(mie3[,2]/c1, d*(4/3*pi*(0.5*mie3[,1])^3)*e, xout=scatter)
                       mie <- data.frame(cbind(scatter=s1$x,
                                                   diam_mid=s1$y,diam_upr=s2$y,diam_lwr = s3$y,
                                                   Qc_mid=s4$y, Qc_upr=s5$y, Qc_lwr=s6$y))
