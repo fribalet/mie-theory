@@ -3,7 +3,6 @@ library(viridis)
 path.to.git.repository <- "~/Documents/DATA/Codes/mie-theory"
 setwd(path.to.git.repository)
 
-
 #############################
 ### scatter normalization ###
 #############################
@@ -59,7 +58,7 @@ sigma.lsq <- function(mie, beads, params){
 ######################################################
 png("Mie-beads-scatter.png",width=12, height=6, unit='in', res=400)
 
-par(mfrow=c(1,3))
+par(mfrow=c(1,3), pty='s', cex=1.2)
 
 for(inst in c(740,751,989)){
 
@@ -116,11 +115,11 @@ s6 <- approx((mie3[,2]/c)^b, d*(4/3*pi*(0.5*mie3[,1])^3)^e, xout=scatter)
                       	mie_989 <- subset(mie_989, scatter >= min.scatter & scatter <= max.scatter)
 						}
 
-
-plot(beads$normalized.fsc, beads$size,log='xy', main=paste(inst), xlim=c(0.005,10), ylim=c(0.2,50), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="scatter", ylab="size (µm)")
-lines((mie4[,2]/c)^(b), mie4[,1], col='red3')
-legend("topleft",legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
-
+plot(beads$normalized.fsc, beads$size,log='xy', xaxt='n',xlim=c(0.002,10), ylim=c(0.2,20), bg=alpha(viridis(nrow(beads)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1, main=paste(inst))
+axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
+axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
+lines((mie4[,2]/c)^b, mie4[,1], col='red3')
+legend("topleft",cex=0.5, legend=c(paste(unique(beads$size), 'µm-beads'), "Mie-based model (n = 1.6003)"), bty='n', pch=c(rep(21,nrow(beads)/2), NA), lwd=c(rep(NA,nrow(beads)/2), 2),col=c(rep(1,nrow(beads)/2),'red3'), pt.bg=alpha(c(viridis(nrow(beads)/2), 'red3'),0.5))
 
 }
 
