@@ -2,11 +2,11 @@
 ### LINEAR REGRESSION ###
 #########################
 library(scales)
-path.to.git.repository <- "~/Documents/DATA/Codes/fsc-size-calibration"
+path.to.git.repository <- "~/Documents/DATA/Codes/mie-theory/"
 setwd(path.to.git.repository)
 .rainbow.cols <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow","#FF7F00", "red", "#7F0000"))
 
-culture <- read.csv("scatter_calibration.csv")
+culture <- read.csv("~/Documents/DATA/Codes/fsc-size-calibration/scatter_calibration.csv")
 culture$norm.fsc <- culture$fsc / culture$fsc.beads
 culture$norm.fsc.sd <- culture$fsc.sd / culture$fsc.beads
 culture$volume <- 4/3 * pi * (culture$diameter/2)^3
@@ -18,10 +18,10 @@ culture2 <- culture2[order(culture2$norm.fsc),]
 inst <- "Influx"
 
 ir <- c(1.35/1.3371, 1.41/1.3371) # range given in Lehmuskero et al. Progr Oceanogr 2018
-mie2 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-1017INFLUX.csv" ,header=F)) # low
-mie1 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-1031INFLUX.csv" ,header=F)) # fit
-mie3 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-1045INFLUX.csv" ,header=F)) # high
-mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,header=F)) # beads
+mie2 <- t(read.csv("meidata-1010INFLUX.csv" ,header=F)) # low
+mie1 <- t(read.csv("meidata-1032INFLUX.csv" ,header=F)) # fit
+mie3 <- t(read.csv("meidata-1055INFLUX.csv" ,header=F)) # high
+mie4 <- t(read.csv("meidata-beadsINFLUX.csv" ,header=F)) # beads
 
         id <- findInterval(1, mie4[,1]) # find 1 micron beads
 
@@ -29,10 +29,10 @@ mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,
 ### MERGING + SD
                       d <- 0.216
                       e <- 0.939
-                      max.scatter <- 20
-                      min.scatter <- 0.0001
+                      max.scatter <- 30
+                      min.scatter <- 0.000865
 
-                      c1 <- mean(mie4[id,2]) / d
+                      c1 <- mean(mie4[id,2])
                       scatter <- 10^(seq(log10(min(mie1[,2]/c1)), log10(max(mie3[,2]/c1)),length.out=10000))
 
                       s1 <- approx(mie1[,2]/c1, mie1[,1], xout=scatter)
@@ -49,13 +49,7 @@ mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,
 
                         summary(mie)
 
-                    #write.csv(mie, "calibrated-mieINFLUX.csv", row.names=F, quote=F)
-
-                    plot(merge2$norm.fsc,merge2$pgC.cell, log='xy', yaxt='n', xaxt='n', pch=1,xlim=c(0.002,20), ylim=c(0.005,100), ylab=expression(paste("Qc (pgC cell"^{-1},")")), xlab="Normalized scatter (dimensionless)", main=paste("#",inst))
-                    lines(mie$scatter, mie[,paste0('Qc_mid')], col='red3', lwd=2)
-                    lines(mie$scatter, mie[,paste0('Qc_upr')], col='grey', lwd=2)
-                    lines(mie$scatter, mie[,paste0('Qc_lwr')], col='grey', lwd=2)
-                    plot(d*mie4[id,2],mie4[id,1], col='grey', lwd=2)
+                    write.csv(mie, "calibrated-mieINFLUX.csv", row.names=F, quote=F)
 
 
 ###########################
@@ -64,17 +58,14 @@ mie4 <- t(read.csv("~/Documents/DATA/Codes/mie-theory/meidata-beadsINFLUX.csv" ,
 library(scales)
 .rainbow.cols <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow","#FF7F00", "red", "#7F0000"))
 
-path.to.git.repository <- "~/Documents/DATA/Codes/fsc-poc-calibration"
-setwd(path.to.git.repository)
-
 inst <- "Influx"
 
-merge <- read.csv(paste0(inst,"-Qc-cultures.csv"))
+merge <- read.csv(paste0('~/Documents/DATA/Codes/fsc-poc-calibration/',inst,"-Qc-cultures.csv"))
 merge2 <- subset(merge, Sample.ID !="PT 632" & Sample.ID !="EHUX" & Sample.ID !="LICMO")#& Sample.ID !="TAPS 3367" & Sample.ID !="TAPS 1135" & Sample.ID !="NAV")
 merge2 <- merge2[order(merge2$norm.fsc),]
 print(mean(merge2$norm.fsc))
 
-mie <- read.csv("INFLUXcalibrated-mie.csv")
+mie <- read.csv("calibrated-mieINFLUX.csv")
 
 png("INFLUX-Mie-scatter.png",width=6, height=6, unit='in', res=400)
 

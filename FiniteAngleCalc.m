@@ -9,10 +9,10 @@
 tic	% start timer
 
 %%%%  SEAFLOW PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
-m = 1.6;				% 1.017; 1.031; 1.045 refractive index ratio (air/water),1.6 beads, 1.3371 water
+m = 1.35/1.3371;			% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
 lam = 457e-9;			% SEAFLOW laser wavelength
 k = 2*pi/lam;			% wavenumber
-rmax=10;				% maximum radius in microns
+rmax=100;				% maximum radius in microns
 r = exp(linspace(log(0.1),log(rmax),2000))*1e-6;	% particle radius
 angle = [-33.4:.1:-5.7];   % SEAFLOW (NA = 0.55) scattering angles, 
 x = k*r;				%
@@ -22,10 +22,10 @@ ang = angle*pi/180;		% put angle in radians for calc
 
 
 % %%%%  INFLUX PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
-% m = 1.6;				% 1.017; 1.031; 1.045 refractive index ratio (air/water),1.6 beads, 1.3371 water
+% m = 1.35/1.3371;				% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
 % lam = 488e-9;			% SEAFLOW laser wavelength
 % k = 2*pi/lam;			% wavenumber
-% rmax=10;				% maximum radius in microns
+% rmax=100;				% maximum radius in microns
 % r = exp(linspace(log(0.1),log(rmax),2000))*1e-6;	% particle radius
 % angle = [-18.30725:.1:-5.7];    % INFLUX  (NA = 0.42) scattering angles,                         
 % x = k*r;				%
@@ -62,6 +62,8 @@ legend('Parallel','Perpendicular')
 
 
 outPut=[2*r*1e6;avgIpara]; % output in diameter and micron
-csvwrite('meidata-beadsb.csv',outPut);
+% csvwrite('meidata-beads.csv',outPut);
+csvwrite('meidata-1010.csv',outPut);
 % csvwrite('meidata-beadsINFLUX.csv',outPut);
+% csvwrite('meidata-1010INFLUX.csv',outPut);
 
