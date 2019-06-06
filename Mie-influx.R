@@ -27,8 +27,8 @@ mie4 <- t(read.csv("meidata-beadsINFLUX.csv" ,header=F)) # beads
 
 
 ### MERGING + SD
-                      d <- 0.216
-                      e <- 0.939
+                      d <- 0.261
+                      e <- 0.860
                       max.scatter <- 30
                       min.scatter <- 0.000865
 
