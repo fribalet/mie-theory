@@ -13,7 +13,7 @@ m = 1.35/1.3371;			% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 
 lam = 457e-9;			% SEAFLOW laser wavelength
 k = 2*pi/lam;			% wavenumber
 rmax=100;				% maximum radius in microns
-r = exp(linspace(log(0.1),log(rmax),2000))*1e-6;	% particle radius
+r = exp(linspace(log(0.025),log(rmax),2000))*1e-6;	% particle radius
 angle = [-33.4:.1:-5.7];   % SEAFLOW (NA = 0.55) scattering angles, 
 x = k*r;				%
 ang = angle*pi/180;		% put angle in radians for calc
@@ -63,7 +63,9 @@ legend('Parallel','Perpendicular')
 
 outPut=[2*r*1e6;avgIpara]; % output in diameter and micron
 % csvwrite('meidata-beads.csv',outPut);
-csvwrite('meidata-1010.csv',outPut);
+ csvwrite('meidata-1010.csv',outPut);
+% csvwrite('meidata-1032.csv',outPut);
+% csvwrite('meidata-1055.csv',outPut);
 % csvwrite('meidata-beadsINFLUX.csv',outPut);
 % csvwrite('meidata-1010INFLUX.csv',outPut);
 
