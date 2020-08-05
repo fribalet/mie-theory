@@ -8,41 +8,40 @@
 
 tic	% start timer
 
-% %%%%  SEAFLOW PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
-% m = 1.35/1.3371;			% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
+%%%%  SEAFLOW PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
+% m = 1.36/1.3371;			% phytoplankton 1.36, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
 % lam = 457e-9;			% laser wavelength
 % k = 2*pi/lam;			% wavenumber
 % rmax=50;				% maximum radius in microns
 % r = exp(linspace(log(0.025),log(rmax),2000))*1e-6;	% particle radius
-% %angle = [-33.4:.1:-5.7];   % SEAFLOW (NA = 0.55) scattering angles, 
+% angle = [-24.3:.1:-5.7];   % SEAFLOW (NA = 0.55) scattering angles, 
 % x = k*r;				%
 % ang = angle*pi/180;		% put angle in radians for calc
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-% %%%%  INFLUX PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
-% m = 1.35/1.3371;				% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
-% lam = 488e-9;			% laser wavelength
-% k = 2*pi/lam;			% wavenumber
-% rmax=100;				% maximum radius in microns
-% r = exp(linspace(log(0.1),log(rmax),2000))*1e-6;	% particle radius
-% angle = [-18.30725:.1:-5.7];    % INFLUX  (NA = 0.42) scattering angles,                         
-% x = k*r;				%
-% ang = angle*pi/180;		% put angle in radians for calc
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%  LISST PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
-m = 1.35/1.3371;			% phytoplankton 1.35, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
-lam = 670e-9;			% laser wavelength
+%%%%  INFLUX PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
+m = 1.36/1.3371;				% phytoplankton 1.36, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
+lam = 488e-9;			% laser wavelength
 k = 2*pi/lam;			% wavenumber
-rmax=50;				% maximum radius in microns
-r = exp(linspace(log(0.025),log(rmax),2000))*1e-6;	% particle radius
-angle = [-0.03:.01:0.03];   % LISST scattering angles, 
+rmax=100;				% maximum radius in microns
+r = exp(linspace(log(0.01),log(rmax),2000))*1e-6;	% particle radius
+angle = [-18.3:.1:-5.7];    % INFLUX  (NA = 0.42) scattering angles,                         
 x = k*r;				%
 ang = angle*pi/180;		% put angle in radians for calc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% %%%%  LISST PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%
+% m = 1.36/1.3371;			% phytoplankton 1.36, 1.38 and 1.41 for phytoplankton; beads 1.6033, 1.3371 water
+% lam = 670e-9;			% laser wavelength
+% k = 2*pi/lam;			% wavenumber
+% rmax=50;				% maximum radius in microns
+% r = exp(linspace(log(0.025),log(rmax),2000))*1e-6;	% particle radius
+% angle = [-0.03:.01:0.03];   % LISST scattering angles, 
+% x = k*r;				%
+% ang = angle*pi/180;		% put angle in radians for calc
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -72,11 +71,9 @@ legend('Parallel','Perpendicular')
 
 
 outPut=[2*r*1e6;avgIpara]; % output in diameter and micron
-% csvwrite('meidata-beads.csv',outPut);
-% csvwrite('meidata-1010.csv',outPut);
-% csvwrite('meidata-1032.csv',outPut);
-% csvwrite('meidata-1055.csv',outPut);
+% csvwrite('meidata-beads.csv',outPut); 1017 ; 1032; 1055
+%  csvwrite('meidata-1017.csv',outPut);
 % csvwrite('meidata-beadsINFLUX.csv',outPut);
-% csvwrite('meidata-1010INFLUX.csv',outPut);
-csvwrite('meidata-LISST-1.35.csv',outPut);
+  csvwrite('meidata-1017INFLUX.csv',outPut);
+% csvwrite('meidata-LISST-1.35.csv',outPut);
 
