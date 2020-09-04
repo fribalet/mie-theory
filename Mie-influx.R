@@ -1,4 +1,5 @@
 library(scales)
+library(viridis)
 library(DEoptimR)
 path.to.git.repository <- "~/Documents/Codes/mie-theory/"
 setwd(path.to.git.repository)
@@ -81,7 +82,7 @@ print(params)
 d <- 0.261; e <- 0.860 # < 3000 µm3 EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 
 max.scatter <- 20
-min.scatter <- 0.0002
+min.scatter <- 0.0001
 
 b <- params[2]
 c <- params[1]
