@@ -48,12 +48,12 @@ mie_all <- bind_rows(mie1, mie2, mie3, mie4) %>%
 
 
 # optimization routine
-sigma.lsq <- function(mie, beads, params){
+sigma.lsq <- function(theory, beads, params){
 
      c <- params[1]
      b <- params[2]
-     id <- findInterval(beads$diameter, mie$diameter)
-     scatter <- (mie$scatter[id]/c)^b
+     id <- findInterval(beads$diameter, theory$diameter)
+     scatter <- (theory$scatter[id]/c)^b
      df <- tibble(obs=beads$normalized_fsc, pred=scatter)
      sigma <- mean(((df$obs - df$pred)/df$obs)^2,na.rm=T)
   return(sigma)
@@ -79,11 +79,12 @@ if(inst == "Penny") beads <- beadsP
 mie <- mie_all %>% filter( n == 1.199) %>% # beads
   arrange(diameter) 
 
-f <- function(params) sigma.lsq(mie=mie, beads=beads, params)
+f <- function(params) sigma.lsq(theory=mie, beads=beads, params)
 res <- DEoptim(f, lower=c(0,0), upper=c(10000,2),
                control=DEoptim::DEoptim.control(itermax=5000, reltol=1e-3, trace=50, steptol=500, strategy=2, parallelType=0))
 params <- res$optim$bestmem # optimized 'c' and 'b' values
-
+b <- params[2]
+c <- params[1]
 
 ### CREATE LOOKUP TABLE
 #d <- 0.220; e <- 1 # LINEAR Shalapyonok et al. 2001; 0.220 (Li et al. 1992, Veldhuis et al. 2004, and more studies agreed with 220 fg C um-3)
@@ -91,33 +92,41 @@ params <- res$optim$bestmem # optimized 'c' and 'b' values
 #d <- 0.216; e <- 0.939 # ALL Protists EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 d <- 0.261; e <- 0.860 # < 3000 µm3 EXPO Roy, 1. Menden-Deuer, S. & Lessard, E. J. Carbon to volume relationships for dinoflagellates, diatoms, and other protist plankton. Limnol. Oceanogr. 45, 569–579 (2000).
 
-b <- params[2]
-c <- params[1]
+mie_fitted <- mie_all %>%
+  mutate(calib_scatter = (scatter/params[1])^params[2])
 
-spar <- 0.99
+polynom_mie <- mie_fitted %>% 
+  group_by(n) %>% 
+  summarize(coeff = lm(diameter ~ stats:::poly(calib_scatter, 3, raw= TRUE))$coefficients) %>%
+  mutate(parameters = c("a", "b","c","d")) %>%
+  pivot_wider(values_from = coeff, names_from = parameters)
 
-mie_all %>% group_by(n) %>%
-  
-  
-mie %>% summarize(poly = 
-                    
-                    loess(diameter ~ (scatter/c)^b), data = mie, degree = 5)
+mie_fitted <- left_join(mie_fitted, polynom_mie) 
+mie_fitted <- mie_fitted %>% mutate(simplified_diameter = (calib_scatter * d)^3 + 
+                                                    (calib_scatter * c)^2 + 
+                                                     calib_scatter * b + a)
 
-mie_all %>% group_by(n) %>%
-  mutate(scatter_smooth = smooth.spline((scatter/c)^b, diameter, spar=spar, all.knots = TRUE)$x)
-,
-         diam_smooth = smooth.spline((scatter/c)^b, diameter, spar=spar, all.knots = TRUE)$y,
-         Qc_smooth = d*(4/3*pi*(0.5*diam_smooth)^3)^e)
-
-
-mie_all %>% ggplot(aes(scatter, diameter, group = n, col = n)) +
+mie_fitted %>% filter(diameter > 0.2 & diameter < 40) %>%
+  ggplot(aes(calib_scatter, diameter, group = n, col = n)) +
   geom_point(size=0.1) +
+  geom_point(aes(calib_scatter, simplified_diameter, group = n, col = n)) + 
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10")
 
 # Change resolution
-mie_all %>% group_by(n) %>%
-  approx(scatter, size)
+spar <- 0.99
+mie1 <- data.frame(mie1)
+mie2 <- data.frame(mie2)
+mie3 <- data.frame(mie3)
+mie4 <- data.frame(mie4)
+
+smooth.mie1 <- smooth.spline(log10((mie1[,2]/c)^b), log10(mie1[,1]), spar=spar)
+smooth.mie2 <- smooth.spline(log10((mie2[,2]/c)^b), log10(mie2[,1]), spar=spar)
+smooth.mie3 <- smooth.spline(log10((mie3[,2]/c)^b), log10(mie3[,1]), spar=spar)
+smooth.mie4 <- smooth.spline(log10((mie1[,2]/c)^b), log10(d*(4/3*pi*(0.5*mie1[,1])^3)^e), spar=spar)
+smooth.mie5 <- smooth.spline(log10((mie2[,2]/c)^b), log10(d*(4/3*pi*(0.5*mie2[,1])^3)^e), spar=spar)
+smooth.mie6 <- smooth.spline(log10((mie3[,2]/c)^b), log10(d*(4/3*pi*(0.5*mie3[,1])^3)^e), spar=spar)
+
 scatter <- 10^(seq(log10(min(mie2[,2]/c)), log10(max(mie3[,2]/c)),length.out=10000))
 s1 <- approx(10^smooth.mie1$x, 10^smooth.mie1$y, xout=scatter)
 s2 <- approx(10^smooth.mie2$x, 10^smooth.mie2$y, xout=scatter)
@@ -125,6 +134,9 @@ s3 <- approx(10^smooth.mie3$x, 10^smooth.mie3$y, xout=scatter)
 s4 <- approx(10^smooth.mie4$x, 10^smooth.mie4$y, xout=scatter)
 s5 <- approx(10^smooth.mie5$x, 10^smooth.mie5$y, xout=scatter)
 s6 <- approx(10^smooth.mie6$x, 10^smooth.mie6$y, xout=scatter)
+
+max.scatter <- 20
+min.scatter <- 0.0005
 
 print(mean(s2$y, na.rm=T))
 
@@ -140,7 +152,7 @@ if(inst == "Penny"){mie_Penny <- data.frame(cbind(scatter=s1$x,
 
 n <- unique(beads$size)
 
-plot(beads$normalized.fsc, beads$size, xaxt='n',xlim=c(0.002,10), ylim=c(0.2,20), bg=alpha(viridis(length(n)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1, main=paste(inst))
+plot(beads$normalized_fsc, beads$size, xaxt='n',xlim=c(0.002,10), ylim=c(0.2,20), bg=alpha(viridis(length(n)),0.5),cex=2, pch=21, xlab="Normalized scatter (dimensionless)", ylab="Cell diameter (µm)", las=1, main=paste(inst))
 axis(1, at=c(0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5,1,2,5))
 axis(2, at=c(0.1,0.2,0.5,1,2,5,10,20),las=1)
 lines((mie4[,2]/c)^b, mie4[,1], col='red3')
