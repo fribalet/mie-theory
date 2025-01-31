@@ -1,17 +1,20 @@
-# 'RB1 is a function used to calculate the Ricatti-Bessel functions of the first 
-#' and second # 'kinds respectively. The function provides the radial component 
-#' of the scattering coefficients.
-# 'RB1(r, nmax) calculates the Ricatti-Bessel function of the first
-# 'kind from order 1 to nmax, for radius parameter(s) r, by downwards
-# 'recursion. The returns are nmax-by-nr matrices, where nr is the dimension
-# 'of the vector r, each column representing the results for one radius.
-#' 
-#' RB2(r, nmax) similarly calculates the Ricatti-Bessel function by upwards recursion.
-#' 
-#' @param r radius.
-#' @param nmax maximum order of the Ricatti-Bessel function.
-#' @return nmax-by-nr matrices, where nr is the dimension
-# 'of the vector r, each column representing the results for one radius.
+#' Calculate Ricatti-Bessel functions of the first kind
+#'
+#' This function calculates the Ricatti-Bessel functions of the first kind 
+#' from order 1 to `nmax` for the given radius parameter(s) `r`, using 
+#' downwards recursion.
+#'
+#' @param r Numeric vector of radius parameters.
+#' @param nmax Integer specifying the maximum order of the Ricatti-Bessel function.
+#'
+#' @return A matrix of dimensions `nmax` by `length(r)`, where each column 
+#'   represents the Ricatti-Bessel functions of the first kind for a 
+#'   specific radius parameter.
+#'
+#' @seealso \code{\link{RB2}} for calculating Ricatti-Bessel functions of the second kind.
+#' @examples
+#' RB1(r = 1:10, nmax = 5)
+
 RB1 <- function(r, nmax) {
   # Ensure r is a column vector
   r <- as.vector(r)
@@ -43,20 +46,23 @@ RB1 <- function(r, nmax) {
   return(phi)
 }
 
-# 'RB2 is a function used to calculate the Ricatti-Bessel functions of the first 
-#' and second # 'kinds respectively. The function provides the radial component 
-#' of the scattering coefficients.
-# 'RB2(r, nmax) calculates the Ricatti-Bessel function of the first
-# 'kind from order 1 to nmax, for radius parameter(s) r, by upwards
-# 'recursion. The returns are nmax-by-nr matrices, where nr is the dimension
-# 'of the vector r, each column representing the results for one radius.
-#' 
-#' RB1(r, nmax) similarly calculates the Ricatti-Bessel function by downwards recursion.
-
-#' @param r radius.
-#' @param nmax maximum order of the Ricatti-Bessel function.
-#' @return nmax-by-nr matrices, where nr is the dimension
-# 'of the vector r, each column representing the results for one radius.
+#' Calculate Ricatti-Bessel functions of the second kind
+#'
+#' This function calculates the Ricatti-Bessel functions of the second kind 
+#' from order 1 to `nmax` for the given radius parameter(s) `r`, using 
+#' upwards recursion.
+#'
+#' @param r Numeric vector of radius parameters.
+#' @param nmax Integer specifying the maximum order of the Ricatti-Bessel function.
+#'
+#' @return A matrix of dimensions `nmax` by `length(r)`, where each column 
+#'   represents the Ricatti-Bessel functions of the second kind for a 
+#'   specific radius parameter.
+#'
+#' @seealso \code{\link{RB1}} for calculating Ricatti-Bessel functions of the first kind.
+#'
+#' @examples
+#' RB2(r = 1:10, nmax = 5)
 RB2 <- function(r, nmax) {
   # Ensure r is a vector
   r <- as.vector(r)
@@ -81,20 +87,34 @@ RB2 <- function(r, nmax) {
   return(zeta)
 }
 
-#' ScatCoef is a function used to calculate the scattering coefficients required
-#' by Mie calculations (e.g. scattering intensity)
-#' This function requires the Ricatti-Bessel functions. 
-#' It calculates the scattering coefficients from order 1 to nmax for refractive
-#' index and particle size parameter(s) m and x. The function returns a and b 
-#' are complex nmax-by-nx matrices, where nx is the dimension of the m and/or x, 
-#' with each column representing one particle parameter(pair). 
-#' m, x or both can be scalar. If both are vectors, they must be of the same 
-#' dimension to form particle parameter pairs.
-#' @param r radius.
-#' @param x refractive index.
-#' @param nmax maximum order of the Ricatti-Bessel function.
-#' @return returns a list of a and b, that are nmax-by-nr matrices, where nr is the dimension
-# 'of the vector r, each column representing the results for one radius.
+#' Calculate scattering coefficients for Mie calculations
+#'
+#' This function calculates the scattering coefficients required for Mie 
+#' calculations (e.g., scattering intensity). It uses the Ricatti-Bessel 
+#' functions to compute the coefficients `a` and `b` from order 1 to `nmax` 
+#' for the given refractive index (`r`) and particle size parameter(s) (`x`).
+#'
+#' @param r Numeric vector of refractive indices. Can be a scalar.
+#' @param x Numeric vector of particle size parameters. Can be a scalar.
+#' @param nmax Integer specifying the maximum order of the 
+#'   Ricatti-Bessel function.
+#'
+#' @return A list containing: 
+#' \itemize{
+#'  \item `a`: A complex matrix of dimensions `nmax` by `length(r)` (or `length(x)` 
+#'          if `x` is a vector), where each column represents the `a` 
+#'          scattering coefficients for a specific particle parameter (pair).
+#'  \item `b`: A complex matrix of dimensions `nmax` by `length(r)` (or `length(x)` 
+#'          if `x` is a vector), where each column represents the `b` 
+#'          scattering coefficients for a specific particle parameter (pair).
+#' }
+#' @details 
+#' If both `r` and `x` are vectors, they must have the same length to form 
+#' particle parameter pairs. If either `r` or `x` is a scalar, it will be 
+#' expanded to match the length of the other vector.
+#'
+#' @examples
+#' ScatCoef(r = 1.5, x = 1:10, nmax = 5)
 ScatCoef <- function(r, x, nmax) {
 
   r <- as.vector(r)
@@ -153,17 +173,25 @@ ScatCoef <- function(r, x, nmax) {
 }
 
 
-#' The ALegendr function returns the required functions of the associated Legendre
-#' polynomials. This function is required to provide the scattering angle 
-#' dependency of the scattered intensity.
-#' The function calculates the required functions from order 1 to nmax, 
-#' for angle(s) q, by upwards recursion. The returns p and t are nmax-by-nq
-#' matrices, where nq is the dimension of the vector q, each column representing 
-#' the results for one angle.
-#' @param ang scattering angle.
-#' @param nmax maximum order of the Ricatti-Bessel function.
-#' @return returns a list of p and t, that are nmax-by-nq matrices, where nq is 
-#' the dimension of the vector q, each column representing  the results for one angle.
+#' Calculate associated Legendre polynomial functions
+#'
+#' This function calculates the required functions of the associated Legendre 
+#' polynomials, which are needed to determine the scattering angle dependence 
+#' of scattered intensity. It computes the functions from order 1 to `nmax` 
+#' for the given scattering angle(s) (`ang`) using upwards recursion.
+#'
+#' @param ang Numeric vector of scattering angles (in radians).
+#' @param nmax Integer specifying the maximum order of the functions.
+#'
+#' @return A list containing:
+#'  \itemize{
+#'    \item `p`: A matrix of dimensions `nmax` by `length(ang)`, where each column 
+#'          represents the `p` function values for a specific angle.
+#'    \item `t`: A matrix of dimensions `nmax` by `length(ang)`, where each column 
+#'          represents the `t` function values for a specific angle.
+#' }
+#' @examples
+#' ALegendr(ang = seq(0, pi, length.out = 10), nmax = 5)
 ALegendr <- function(ang, nmax) {
   # Initialize matrices p and t
   p <- matrix(NA, nrow = nmax, ncol = length(ang))
@@ -183,16 +211,33 @@ ALegendr <- function(ang, nmax) {
 }
 
 
-#' The Intensity function returns Stoke's vector of scattered light.
-#' the function calculates  the scattered Light for a sphere, size x, 
-#' refractive index relative to medium m, at angle ang.
-#' The incident light is polarized. If m and/or x are vectors, return will 3D,
-#' with m and/or x parameters spanning third dimension.
-#' @param m the Refractive index ratio of the sphere to the medium.
-#' @param x The Size parameter
-#' @param ang scattering angle (in radians).
-#' @return returns a list of p and t, that are nmax-by-nq matrices, where nq is 
-#' the dimension of the vector q, each column representing  the results for one angle.
+#' Calculate scattered light intensity for a sphere
+#'
+#' This function calculates the scattered light intensity for a sphere, 
+#' given its size parameter (`x`), refractive index relative to the medium (`m`), 
+#' and scattering angle (`ang`). The incident light is assumed to be polarized.
+#'
+#' @param m Numeric vector of refractive index ratios. Can be a scalar.
+#' @param x Numeric vector of size parameters. Can be a scalar.
+#' @param ang Numeric vector of scattering angles (in radians).
+#'
+#' @return A list containing:
+#' \itemize{
+#'  \item `I1`: A matrix representing the parallel component of the scattered 
+#'          light intensity. If `m` and/or `x` are vectors, `I1` will be a 3D 
+#'          array with dimensions corresponding to `length(ang)`, `length(m)`, 
+#'          and `length(x)`.
+#'  \item `I2`: A matrix representing the perpendicular component of the scattered 
+#'          light intensity.  If `m` and/or `x` are vectors, `I2` will be a 3D 
+#'          array with dimensions corresponding to `length(ang)`, `length(m)`, 
+#'          and `length(x)`.
+#' }
+#' @details
+#' If `m` and/or `x` are vectors, the output matrices `I1` and `I2` will be 3D 
+#' arrays, with the `m` and/or `x` parameters spanning the third dimension.
+#'
+#' @examples
+#' Intensity(m = 1.5, x = 1:10, ang = seq(0, pi, length.out = 20))
 Intensity <- function(m, x, ang) {
   
   # Ensure x and m are vectors of the same length
@@ -271,20 +316,25 @@ Intensity <- function(m, x, ang) {
 }
 
 
-#' The function FiniteAngleCalc calculates Mie scattering intensity for a sphere
-#' of given parameters at the required angle.
-#' 
-#' The function returns both the parallel and perpendicular components of the 
-#' scattered light across the range of particle diameter.
+#' Calculate Mie scattering intensity for a sphere at finite angles
 #'
-#'@param np The refractive index of the particle.
-#'@param nm The refractive index of the medium.
-#'@param wl The wavelength of the incident light (in nanometer).
-#'@param na The numerical aperture of the objective lens.
-#'@param dmin The minimum diameter of the particle (in microns). Needs to be larger than 0
-#'@param dmax The maximum diameter of the particle (in microns).
-#' @return returns a table of the parallel and perpendicular components of the 
-#' scattered light across the range of particle diameter.
+#' This function calculates the Mie scattering intensity for a sphere with 
+#' given parameters across a range of particle diameters. It returns both the 
+#' parallel and perpendicular components of the scattered light.
+#'
+#' @param np Refractive index of the particle.
+#' @param nm Refractive index of the medium.
+#' @param wl Wavelength of the incident light in nanometers.
+#' @param na Numerical aperture of the objective lens.
+#' @param dmin Minimum diameter of the particle in microns (must be > 0).
+#' @param dmax Maximum diameter of the particle in microns.
+#'
+#' @return A data frame with the following columns:
+#' \itemize{
+#'  \item `Diameter`: Particle diameter in microns.
+#'  \item `AvgIpara`: Average parallel component of scattered intensity.
+#'  \item `AvgIperp`: Average perpendicular component of scattered intensity.
+#'  }
 #' @export
 #' @examples
 #' 
