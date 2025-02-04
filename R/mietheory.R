@@ -357,15 +357,13 @@ Intensity <- function(m, x, ang) {
 #' dmin <- 0.025   # Minimum radius (microns)
 #' dmax <- 50      # Maximum radius (microns)
 #'
-#' df <- FiniteAngleCalc(np, nm, lam, na, dmin, dmax)
+#' df <- FiniteAngleCalc(np, nm, wl, na, dmin, dmax)
 #'
 #' ggplot2::ggplot(df, ggplot2::aes(x = Diameter, y = AvgIpara)) +
 #'   ggplot2::geom_line() +
 #'   ggplot2::scale_y_log10() +
 #'   ggplot2::labs(y = 'Relative Intensity', x = 'Diameter (µm)') +
-#'   ggplot2::theme_bw() +
-#'   ggplot2::theme(legend.position = "bottom") +
-#'   ggplot2::ggtitle('Intensity vs Diameter')
+#'   ggplot2::theme_bw() 
 #'   
 #' # Save output
 #' # readr::write_csv(df, paste0('mie_',round(m,3),'n.csv'))
