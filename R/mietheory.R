@@ -326,8 +326,8 @@ Intensity <- function(m, x, ang) {
 #' @param nm Refractive index of the medium.
 #' @param wl Wavelength of the incident light in nanometers.
 #' @param na Numerical aperture of the objective lens.
-#' @param dmin Minimum diameter of the particle in microns (must be > 0).
-#' @param dmax Maximum diameter of the particle in microns.
+#' @param d Range of diameter of the particle in microns (must be > 0).
+#' @param fsc Forward scattering (TRUE) or Side scattering (FALSE) (TRUE by default)
 #'
 #' @return A data frame with the following columns:
 #' \itemize{
@@ -353,11 +353,12 @@ Intensity <- function(m, x, ang) {
 #' na <- 0.55 # (SeaFlow)
 #' # na <- 0.42  # (InFlux)
 #'
-#' # Particle size range 
-#' dmin <- 0.025   # Minimum radius (microns)
-#' dmax <- 50      # Maximum radius (microns)
+#' # Particle size range in micrometer (log space sequence)
+#' dmin <- 0.025   # Minimum diameter (microns)
+#' dmax <- 50      # Maximum diameter (microns)
+#' d <- 10^(seq(log10(dmin/2), log10(dmax/2), length.out = 2000)) # Particle radius
 #'
-#' df <- FiniteAngleCalc(np, nm, wl, na, dmin, dmax)
+#' df <- FiniteAngleCalc(np, nm, wl, na, r)
 #'
 #' ggplot2::ggplot(df, ggplot2::aes(x = Diameter, y = AvgIpara)) +
 #'   ggplot2::geom_line() +
@@ -367,16 +368,21 @@ Intensity <- function(m, x, ang) {
 #'   
 #' # Save output
 #' # readr::write_csv(df, paste0('mie_',round(m,3),'n.csv'))
-FiniteAngleCalc <- function(np, nm, wl, na, dmin, dmax) {
+FiniteAngleCalc <- function(np, nm, wl, na, d, fsc = TRUE) {
   
   # Calculate parameters
   m <- np / nm  # Refractive index ratio
   lam <- wl * 1e-9  # Convert wavelength to microns
   k <- 2 * pi / lam   # wavenumber
-  r <- 10^(seq(log10(dmin/2), log10(dmax/2), length.out = 2000)) * 1e-6  # Particle radius
+  r <- d/2  * 1e-6 # Convert diameter to radius in meters
   x <- k * r  # Size parameter
   max_angle <- -asin(na/nm)* 180/pi # Calculate scattering angles
-  angle <- seq(max_angle, -5.7, by = 0.1)  # Scattering angles (-5.7 to account for the scatter bar)
+  if(fsc){
+    angle <- seq(max_angle, -5.7, by = 0.1) # Scattering angles (-5.7 to account for the scatter bar)
+  }else{
+    angle <- -90 + seq(0, -max_angle, by = 0.1)
+    #angle <- seq(max_angle - 90, -90, by = 0.1)
+  }
   ang <- angle * pi / 180  # Convert to radians
   
   # Calculate intensities
@@ -391,6 +397,6 @@ FiniteAngleCalc <- function(np, nm, wl, na, dmin, dmax) {
   avgIperp <- rowSums(Iperp, na.rm = TRUE) / length(angle)
   
   # Create a data frame
-  df <- dplyr::tibble(Diameter = 2 * r * 1e6, AvgIpara = avgIpara, AvgIperp = avgIperp)
+  df <- dplyr::tibble(Diameter = d, AvgIpara = avgIpara, AvgIperp = avgIperp)
   return(df)
 }
